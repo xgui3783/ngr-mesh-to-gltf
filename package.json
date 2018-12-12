@@ -2,7 +2,7 @@
   "name": "ngr-mesh-to-gltf",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "mocha test/test.js"
   },
