@@ -21,7 +21,8 @@ const getFragmentBuffer = (url) => new Promise((resolve, reject) => {
     /**
      * necessary to get body as buffer
      */
-    encoding: null
+    encoding: null,
+    gzip: true
   }, (err, resp, body) => {
     if (err)
       return reject(err)
