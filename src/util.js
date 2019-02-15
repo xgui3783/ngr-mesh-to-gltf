@@ -247,8 +247,23 @@ exports.transformGltfInfoToGltfFragment = ({numVertices, normals, numTriangles, 
   }
 }
 
+const getInfoFromNgMeshBin = (buffer) => {
+  const numVertices = buffer.readInt32LE(0)
+  const faceOffset = numVertices * 12 + 4
+  const numFaces = (Buffer.byteLength(buffer) - faceOffset) / 4
+
+  return {
+    numVertices,
+    faceOffset,
+    numFaces
+  }
+}
+
+exports.getInfoFromNgMeshBin = getInfoFromNgMeshBin
+
 exports.getGltfInfoFromBuffer = (fragmentPath, buffer, material, {calculateNormal}) => {
 
+  const { numVertices, faceOffset, numFaces: numTriangles} = getInfoFromNgMeshBin(buffer)
   let numVertices = buffer.readInt32LE(0)
   let numTriangles = (Buffer.byteLength(buffer) - 4 - numVertices * 12) / 4
   let i = 0, vertices = []
@@ -258,19 +273,38 @@ exports.getGltfInfoFromBuffer = (fragmentPath, buffer, material, {calculateNorma
     )
     i += 1
   }
+  // const xs = vertices.map(v => v[0])
+  // const ys = vertices.map(v => v[1])
+  // const zs = vertices.map(v => v[2])
+
+  /**
+   * TODO should be quicker in executing
+   */
   const xs = vertices.map(v => v[0])
+  const xsSorted = xs.sort()
+  const maxx = xsSorted.slice(-1)[0]
+  const minx = xsSorted.slice(0, 1)[0]
+
   const ys = vertices.map(v => v[1])
+  const ysSorted = ys.sort()
+  const maxy = ysSorted.slice(-1)[0]
+  const miny = ysSorted.slice(0, 1)[0]
+
   const zs = vertices.map(v => v[2])
+  const zsSorted = zs.sort()
+  const maxz = zsSorted.slice(-1)[0]
+  const minz = zsSorted.slice(0, 1)[0]
+
 
   return Object.assign({}, {
     numVertices,
     numTriangles,
-    maxx: Math.max(...xs),
-    minx: Math.min(...xs),
-    maxy: Math.max(...ys),
-    miny: Math.min(...ys),
-    maxz: Math.max(...zs),
-    minz: Math.min(...zs),
+    maxx,
+    minx,
+    maxy,
+    miny,
+    maxz,
+    minz,
     binUri: fragmentPath,
     material
   }, calculateNormal
