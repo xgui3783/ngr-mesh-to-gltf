@@ -250,7 +250,7 @@ exports.transformGltfInfoToGltfFragment = ({numVertices, normals, numTriangles, 
 const getInfoFromNgMeshBin = (buffer) => {
   const numVertices = buffer.readInt32LE(0)
   const faceOffset = numVertices * 12 + 4
-  const numFaces = (Buffer.byteLength(buffer) - faceOffset) / 4
+  const numFaces = (Buffer.byteLength(buffer) - faceOffset) / 12
 
   return {
     numVertices,
@@ -263,7 +263,7 @@ exports.getInfoFromNgMeshBin = getInfoFromNgMeshBin
 
 exports.getGltfInfoFromBuffer = (fragmentPath, buffer, material, {calculateNormal}) => {
 
-  const { numVertices, faceOffset, numFaces: numTriangles} = getInfoFromNgMeshBin(buffer)
+  const { numVertices, faceOffset, numFaces} = getInfoFromNgMeshBin(buffer)
   let i = 0, vertices = []
   while(i < numVertices){
     vertices.push(
@@ -296,7 +296,7 @@ exports.getGltfInfoFromBuffer = (fragmentPath, buffer, material, {calculateNorma
 
   return Object.assign({}, {
     numVertices,
-    numTriangles,
+    numTriangles: numFaces * 3,
     maxx,
     minx,
     maxy,
