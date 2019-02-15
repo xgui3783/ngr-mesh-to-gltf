@@ -264,8 +264,6 @@ exports.getInfoFromNgMeshBin = getInfoFromNgMeshBin
 exports.getGltfInfoFromBuffer = (fragmentPath, buffer, material, {calculateNormal}) => {
 
   const { numVertices, faceOffset, numFaces: numTriangles} = getInfoFromNgMeshBin(buffer)
-  let numVertices = buffer.readInt32LE(0)
-  let numTriangles = (Buffer.byteLength(buffer) - 4 - numVertices * 12) / 4
   let i = 0, vertices = []
   while(i < numVertices){
     vertices.push(
