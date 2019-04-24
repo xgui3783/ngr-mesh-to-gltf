@@ -377,3 +377,30 @@ exports.reconstructGltf = (array) => {
 
   return completeGlTF
 }
+
+const invertFaces = (buffer) => {
+  const { faceOffset, numFaces, numVertices } = getInfoFromNgMeshBin(buffer)
+
+  const numVertVerticesBuffer = buffer.slice(0, faceOffset)
+  let faceIdx = 0
+  let faceBuffer = Buffer.concat([numVertVerticesBuffer])
+  console.log(`total num faces: ${numFaces}`)
+  while (faceIdx < numFaces) {
+    if (faceIdx % 100 === 0) {
+      console.log(`just finished face no. ${faceIdx}`)
+    }
+    const idx1 = buffer.readUInt32LE(faceOffset + 12 * faceIdx)
+    const idx2 = buffer.readUInt32LE(faceOffset + 12 * faceIdx + 4)
+    const idx3 = buffer.readUInt32LE(faceOffset + 12 * faceIdx + 8)
+    const idxArray = new Uint32Array(3)
+    idxArray[0] = idx1
+    idxArray[1] = idx3
+    idxArray[2] = idx2
+    const buf = Buffer.from(idxArray.buffer)
+    faceBuffer = Buffer.concat([faceBuffer, buf ])
+    faceIdx += 1
+  }
+  return faceBuffer
+}
+
+exports.invertFaces = invertFaces
